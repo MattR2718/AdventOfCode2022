@@ -1,0 +1,5 @@
+PowerShell:
+Measure-Command {.\day3.exe | Out-Default}
+
+cmd:
+powershell -Command "Measure-Command {./day3.exe | Out-Default}"
