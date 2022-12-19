@@ -29,7 +29,7 @@ auto getInput(){
 #else
     while (std::getline(f, linetxt)){
 #endif
-        std::cout << linetxt << '\n';
+        //std::cout << linetxt << '\n';
         std::regex_match(linetxt, m, ex);
         out.emplace_back(Blueprint{std::stoi(m[1]), std::stoi(m[2]),std::stoi(m[3]), std::stoi(m[4]), std::stoi(m[5]), std::stoi(m[6]), std::stoi(m[7])});
     }
@@ -129,7 +129,7 @@ auto run1(T input){
         Node root(0, 0, 0, 0, 0, 1, 0, 0, 0, in, maxG);
         //root.print();
         //int maxGeode = getMax(root);
-        //std::cout<<maxG<<'\n';
+        std::cout<<in.id<<' '<<maxG<<maxG * in.id<<'\n';
         sum += maxG * in.id;
     }
 
@@ -162,6 +162,6 @@ int main(){
         std::cout<<i<<'\n';
     }
    
-    std::cout<<"Part 1: "<<run1(std::vector<Blueprint>{input[0]})<<'\n';
+    std::cout<<"Part 1: "<<run1(input)<<'\n';
     //std::cout<<"Part 2: "<<run2(input)<<'\n';
 }
