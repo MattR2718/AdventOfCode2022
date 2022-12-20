@@ -6,7 +6,7 @@
 #include <map>
 #include <regex>
 
-#define vscode true
+#define vscode false
 
 struct Blueprint{
     int id, oreRobotOreCost, clayRobotOreCost, obsidianRobotOreCost, obsidianRobotClayCost, geodeRobotOreCost, geodeRobotObsidianCost;
@@ -19,7 +19,7 @@ std::ostream& operator<<(std::ostream& os, const Blueprint& b){
 }
 
 auto getInput(){
-    std::ifstream f("../../../../Day19/test.txt");
+    std::ifstream f("../../../../Day19/input.txt");
     std::string linetxt;
     std::vector<Blueprint> out;
     std::regex ex("Blueprint ([0-9]+): Each ore robot costs ([0-9]+) ore. Each clay robot costs ([0-9]+) ore. Each obsidian robot costs ([0-9]+) ore and ([0-9]+) clay. Each geode robot costs ([0-9]+) ore and ([0-9]+) obsidian.");
@@ -37,8 +37,8 @@ auto getInput(){
 }
 
 //<time, geoNum>
-std::vector<std::pair<int8_t, int8_t>> cache;
-//std::pair<int, int> cache;
+//std::vector<std::pair<int8_t, int8_t>> cache;
+std::pair<int8_t, int8_t> cache;
 
 struct Node{
     /*int8_t currentTime;
@@ -52,7 +52,7 @@ struct Node{
     int8_t geodeRobotNum;*/
     //Blueprint blueprint;
     std::vector<Node> next;
-    Node(int currentTime, int oreNum, int clayNum, int obsidianNum, int geodeNum, int oreRobotNum, int clayRobotNum, int obsidianRobotNum, int geodeRobotNum, const Blueprint& blueprint, int& maxG){
+    Node(int8_t currentTime, int8_t oreNum, int8_t clayNum, int8_t obsidianNum, int8_t geodeNum, int8_t oreRobotNum, int8_t clayRobotNum, int8_t obsidianRobotNum, int8_t geodeRobotNum, const Blueprint& blueprint, int& maxG, const int8_t totalTime){
         /*currentTime = ct;
         oreNum = on;
         clayNum = cn;
@@ -67,50 +67,57 @@ struct Node{
 
         if(currentTime == 24){ /* std::cout<<"RETURNING\n"; */ return; }
 
-        for (auto& c : cache) {
+        /*for (auto& c : cache) {
             if (c.first < currentTime && c.second > geodeNum) { return; }
         }
-        if (geodeNum > 0) { cache.emplace_back(std::pair(currentTime, geodeNum)); }
+        if (geodeNum > 0) { cache.emplace_back(std::pair(currentTime, geodeNum));  }*/
+
+         if(cache.first < currentTime && cache.second > geodeNum){ return; }
+        else if(geodeNum > 0){ cache = std::pair(currentTime, geodeNum); } 
 
         maxG = (maxG > geodeNum + geodeRobotNum) ? maxG : geodeNum + geodeRobotNum;
 
-        /* if(cache.first < currentTime && cache.second > geodeNum){ return; }
-        else if(geodeNum > 0){ cache = { currentTime, geodeNum }; } */
 
         //std::cout<<"ORENUM: "<<oreNum<<" CLAYNUM: "<<clayNum<<" OBSIDIANNUM: "<<obsidianNum<<" GEODENUM: "<<geodeNum<<'\n';
 
-        
-        //if can make geode robot always make and dont try anything else to save branches
-        //else{
+        //Make geode robot
+        //Only make if can, since not used to make anything and want to maximise always try to make
+        if (oreNum >= blueprint.geodeRobotOreCost && obsidianNum >= blueprint.geodeRobotObsidianCost) {
+            //std::cout<<"GEODE ROBOT\n";
+            next.push_back(Node(currentTime + 1, oreNum + oreRobotNum - blueprint.geodeRobotOreCost, clayNum + clayRobotNum, obsidianNum + obsidianRobotNum - blueprint.geodeRobotObsidianCost, geodeNum + geodeRobotNum, oreRobotNum, clayRobotNum, obsidianRobotNum, geodeRobotNum + 1, blueprint, maxG, totalTime));
+        }
+        else {
+
             //Just mine
             //std::cout<<"JUST MINE\n";
-            next.push_back(Node(currentTime + 1, oreNum + oreRobotNum, clayNum + clayRobotNum, obsidianNum + obsidianRobotNum, geodeNum + geodeRobotNum, oreRobotNum, clayRobotNum, obsidianRobotNum, geodeRobotNum, blueprint, maxG));
+            next.push_back(Node(currentTime + 1, oreNum + oreRobotNum, clayNum + clayRobotNum, obsidianNum + obsidianRobotNum, geodeNum + geodeRobotNum, oreRobotNum, clayRobotNum, obsidianRobotNum, geodeRobotNum, blueprint, maxG, totalTime));
             //Make Ore Robot
             //Only make robot if have enough ore and the number of ore robots is less than the max required ore since no point making more ore each turn than can be used
             //Should significantly reduce branches
-            if(oreNum >= blueprint.oreRobotOreCost && oreRobotNum < blueprint.oreRobotOreCost && oreRobotNum < blueprint.clayRobotOreCost && oreRobotNum < blueprint.obsidianRobotOreCost && oreRobotNum < blueprint.geodeRobotOreCost){
+            int maxOreReq = 0;
+            if (maxOreReq < blueprint.oreRobotOreCost) { maxOreReq = blueprint.oreRobotOreCost; }
+            if (maxOreReq < blueprint.clayRobotOreCost) { maxOreReq = blueprint.clayRobotOreCost; }
+            if (maxOreReq < blueprint.obsidianRobotOreCost) { maxOreReq = blueprint.obsidianRobotOreCost; }
+            if (maxOreReq < blueprint.geodeRobotOreCost) { maxOreReq = blueprint.geodeRobotOreCost; }
+            //if(oreNum >= blueprint.oreRobotOreCost && oreRobotNum < blueprint.oreRobotOreCost && oreRobotNum < blueprint.clayRobotOreCost && oreRobotNum < blueprint.obsidianRobotOreCost && oreRobotNum < blueprint.geodeRobotOreCost && oreRobotNum * (totalTime - currentTime) + oreNum < (totalTime - currentTime) * maxOreReq){
+            if (oreNum >= blueprint.oreRobotOreCost && oreRobotNum < maxOreReq && oreRobotNum * (totalTime - currentTime) + oreNum < (totalTime - currentTime) * maxOreReq) {
                 //std::cout<<"ORE ROBOT\n";
-                next.push_back(Node(currentTime + 1, oreNum + oreRobotNum - blueprint.oreRobotOreCost, clayNum + clayRobotNum, obsidianNum + obsidianRobotNum, geodeNum + geodeRobotNum, oreRobotNum + 1, clayRobotNum, obsidianRobotNum, geodeRobotNum, blueprint, maxG));
+                next.push_back(Node(currentTime + 1, oreNum + oreRobotNum - blueprint.oreRobotOreCost, clayNum + clayRobotNum, obsidianNum + obsidianRobotNum, geodeNum + geodeRobotNum, oreRobotNum + 1, clayRobotNum, obsidianRobotNum, geodeRobotNum, blueprint, maxG, totalTime));
             }
             //Make Clay Robot
             //Only make if have enough clay and makes sense ^
-            if(oreNum >= blueprint.clayRobotOreCost && clayRobotNum < blueprint.obsidianRobotClayCost){
+            if (oreNum >= blueprint.clayRobotOreCost && clayRobotNum < blueprint.obsidianRobotClayCost && clayRobotNum * (totalTime - currentTime) + clayNum < (totalTime - currentTime) * blueprint.obsidianRobotClayCost) {
                 //std::cout<<"CLAY ROBOT\n";
-                next.push_back(Node(currentTime + 1, oreNum + oreRobotNum - blueprint.clayRobotOreCost, clayNum + clayRobotNum, obsidianNum + obsidianRobotNum, geodeNum + geodeRobotNum, oreRobotNum, clayRobotNum + 1, obsidianRobotNum, geodeRobotNum, blueprint, maxG));
+                next.push_back(Node(currentTime + 1, oreNum + oreRobotNum - blueprint.clayRobotOreCost, clayNum + clayRobotNum, obsidianNum + obsidianRobotNum, geodeNum + geodeRobotNum, oreRobotNum, clayRobotNum + 1, obsidianRobotNum, geodeRobotNum, blueprint, maxG, totalTime));
             }
             //Make obsidian Robot
             //Only make if have enough obsidian and makes sense ^
-            if(oreNum >= blueprint.obsidianRobotOreCost && clayNum >= blueprint.obsidianRobotClayCost && obsidianRobotNum < blueprint.geodeRobotObsidianCost){
+            if (oreNum >= blueprint.obsidianRobotOreCost && clayNum >= blueprint.obsidianRobotClayCost && obsidianRobotNum < blueprint.geodeRobotObsidianCost && obsidianRobotNum * (totalTime - currentTime) + obsidianNum < (totalTime - currentTime) * blueprint.geodeRobotObsidianCost) {
                 //std::cout<<"OBSIDIAN ROBOT\n";
-                next.push_back(Node(currentTime + 1, oreNum + oreRobotNum - blueprint.obsidianRobotOreCost, clayNum + clayRobotNum - blueprint.obsidianRobotClayCost, obsidianNum + obsidianRobotNum, geodeNum + geodeRobotNum, oreRobotNum, clayRobotNum, obsidianRobotNum + 1, geodeRobotNum, blueprint, maxG));
+                next.push_back(Node(currentTime + 1, oreNum + oreRobotNum - blueprint.obsidianRobotOreCost, clayNum + clayRobotNum - blueprint.obsidianRobotClayCost, obsidianNum + obsidianRobotNum, geodeNum + geodeRobotNum, oreRobotNum, clayRobotNum, obsidianRobotNum + 1, geodeRobotNum, blueprint, maxG, totalTime));
             }
-            //Make geode robot
-            //Only make if can, since not used to make anything and want to maximise always try to make
-            if(oreNum >= blueprint.geodeRobotOreCost && obsidianNum >= blueprint.geodeRobotObsidianCost){
-                //std::cout<<"GEODE ROBOT\n";
-                next.push_back(Node(currentTime + 1, oreNum + oreRobotNum - blueprint.geodeRobotOreCost, clayNum + clayRobotNum, obsidianNum + obsidianRobotNum - blueprint.geodeRobotObsidianCost, geodeNum + geodeRobotNum, oreRobotNum, clayRobotNum, obsidianRobotNum, geodeRobotNum + 1, blueprint, maxG));
-            }
-        //}
+        }
+        
         
 
         //std::cout<<next.size()<<'\n';
@@ -128,7 +135,7 @@ auto run1(T input){
     int sum = 0;
     for(auto& in : input){
         int maxG = 0;
-        Node root(0, 0, 0, 0, 0, 1, 0, 0, 0, in, maxG);
+        Node root(0, 0, 0, 0, 0, 1, 0, 0, 0, in, maxG, 24);
         //root.print();
         //int maxGeode = getMax(root);
         std::cout<<in.id<<' '<<maxG<<' '<<maxG * in.id<<'\n';
@@ -167,3 +174,19 @@ int main(){
     std::cout<<"Part 1: "<<run1(input)<<'\n';
     //std::cout<<"Part 2: "<<run2(input)<<'\n';
 }
+
+
+//1127 should probably be
+
+/*
+1
+3
+3
+1
+10
+3
+0
+3
+3
+2
+*/
