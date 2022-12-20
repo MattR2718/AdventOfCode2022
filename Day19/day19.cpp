@@ -129,7 +129,7 @@ auto run1(T input){
         Node root(0, 0, 0, 0, 0, 1, 0, 0, 0, in, maxG);
         //root.print();
         //int maxGeode = getMax(root);
-        std::cout<<in.id<<' '<<maxG<<maxG * in.id<<'\n';
+        std::cout<<in.id<<' '<<maxG<<' '<<maxG * in.id<<'\n';
         sum += maxG * in.id;
     }
 
