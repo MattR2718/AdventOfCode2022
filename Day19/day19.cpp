@@ -79,13 +79,9 @@ struct Node{
 
         //std::cout<<"ORENUM: "<<oreNum<<" CLAYNUM: "<<clayNum<<" OBSIDIANNUM: "<<obsidianNum<<" GEODENUM: "<<geodeNum<<'\n';
 
-        //Make geode robot
-        //Only make if can, since not used to make anything and want to maximise always try to make
+        
         //if can make geode robot always make and dont try anything else to save branches
-        if(oreNum >= blueprint.geodeRobotOreCost && obsidianNum >= blueprint.geodeRobotObsidianCost){
-            //std::cout<<"GEODE ROBOT\n";
-            next.push_back(Node(currentTime + 1, oreNum + oreRobotNum - blueprint.geodeRobotOreCost, clayNum + clayRobotNum, obsidianNum + obsidianRobotNum - blueprint.geodeRobotObsidianCost, geodeNum + geodeRobotNum, oreRobotNum, clayRobotNum, obsidianRobotNum, geodeRobotNum + 1, blueprint, maxG));
-        }else{
+        //else{
             //Just mine
             //std::cout<<"JUST MINE\n";
             next.push_back(Node(currentTime + 1, oreNum + oreRobotNum, clayNum + clayRobotNum, obsidianNum + obsidianRobotNum, geodeNum + geodeRobotNum, oreRobotNum, clayRobotNum, obsidianRobotNum, geodeRobotNum, blueprint, maxG));
@@ -108,7 +104,13 @@ struct Node{
                 //std::cout<<"OBSIDIAN ROBOT\n";
                 next.push_back(Node(currentTime + 1, oreNum + oreRobotNum - blueprint.obsidianRobotOreCost, clayNum + clayRobotNum - blueprint.obsidianRobotClayCost, obsidianNum + obsidianRobotNum, geodeNum + geodeRobotNum, oreRobotNum, clayRobotNum, obsidianRobotNum + 1, geodeRobotNum, blueprint, maxG));
             }
-        }
+            //Make geode robot
+            //Only make if can, since not used to make anything and want to maximise always try to make
+            if(oreNum >= blueprint.geodeRobotOreCost && obsidianNum >= blueprint.geodeRobotObsidianCost){
+                //std::cout<<"GEODE ROBOT\n";
+                next.push_back(Node(currentTime + 1, oreNum + oreRobotNum - blueprint.geodeRobotOreCost, clayNum + clayRobotNum, obsidianNum + obsidianRobotNum - blueprint.geodeRobotObsidianCost, geodeNum + geodeRobotNum, oreRobotNum, clayRobotNum, obsidianRobotNum, geodeRobotNum + 1, blueprint, maxG));
+            }
+        //}
         
 
         //std::cout<<next.size()<<'\n';
