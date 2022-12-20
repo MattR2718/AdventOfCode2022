@@ -58,10 +58,10 @@ auto printMap(const T& input, int miny){
 
 template<typename T>
 auto run1(T input){
-    int minx = INT_MAX;
-    int maxx = INT_MIN;
-    int miny = INT_MAX;
-    int maxy = INT_MIN;
+    int minx = 2147483647;
+    int maxx = -2147483647;
+    int miny = 2147483647;
+    int maxy = -2147483647;
 
     for(auto& row : input){
         if(row[0] < minx){ minx = row[0]; }
@@ -145,10 +145,10 @@ auto run1(T input){
 
 template<typename T>
 auto run2(T input){
-    int minx = INT_MAX;
-    int maxx = INT_MIN;
-    int miny = INT_MAX;
-    int maxy = INT_MIN;
+    int minx = 2147483647;
+    int maxx = -2147483647;
+    int miny = 2147483647;
+    int maxy = -2147483647;
 
     for(auto& row : input){
         if(row[0] < minx){ minx = row[0]; }

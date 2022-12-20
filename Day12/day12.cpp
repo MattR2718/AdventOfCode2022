@@ -117,7 +117,7 @@ int bfs(const T& input){
     int i = end;
     while(i != start){
         i = prev[i].first;
-        if(i == -1){ return INT_MAX; }
+        if(i == -1){ return 2147483647; }
         count++;
     }
 
