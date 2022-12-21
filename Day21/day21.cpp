@@ -16,7 +16,7 @@ struct Monkey{
 };
 
 std::ostream& operator<<(std::ostream& os, const Monkey& m){
-    if(m.value != 1000000000){
+    if(m.value != 9223372036854775807LL){
         os <<"  "<<m.name<<": "<<m.value;
     }else{
         os <<"  "<<m.name<<": "<<m.m1<<' '<<m.instr<<' '<<m.m2;
@@ -221,9 +221,9 @@ auto run2(T input){
 int main(){
     auto input = getInput();
     
-    /* for(auto& i : input){
+    for(auto& i : input){
         std::cout<<i<<'\n';
-    } */
+    }
    
     std::cout<<"Part 1: "<<run1(input)<<'\n';
     std::cout<<"Part 2: "<<run2(input)<<'\n';
