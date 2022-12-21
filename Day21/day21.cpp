@@ -37,7 +37,7 @@ auto getInput(){
         if(temp.size() == 2){
             out.emplace_back(Monkey{temp[0].substr(0, 4), std::stoll(temp[1])});
         }else{
-            out.emplace_back(Monkey{temp[0].substr(0, 4), LONG_LONG_MAX, temp[1], temp[2][0], temp[3]});
+            out.emplace_back(Monkey{temp[0].substr(0, 4), 9223372036854775807LL, temp[1], temp[2][0], temp[3]});
         }
     }
     return out;
@@ -51,7 +51,7 @@ int64_t getVal1(const int i, std::vector<Monkey>& monkeys){
         return -1;
     };
 
-    if(monkeys[i].value == LONG_LONG_MAX){
+    if(monkeys[i].value == 9223372036854775807LL){
         int m1 = findMonkey(monkeys[i].m1);
         int m2 = findMonkey(monkeys[i].m2);
         switch(monkeys[i].instr){
@@ -100,7 +100,7 @@ int64_t getVal2(const int i, std::vector<Monkey>& monkeys, int64_t n, int64_t& v
         monkeys[i].value = n;
     }else
 
-    if(monkeys[i].value == LONG_LONG_MAX){
+    if(monkeys[i].value == 9223372036854775807LL){
         int m1 = findMonkey(monkeys[i].m1);
         int m2 = findMonkey(monkeys[i].m2);
         switch(monkeys[i].instr){
