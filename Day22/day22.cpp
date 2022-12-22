@@ -74,7 +74,6 @@ struct Person{
         int number = std::stoi(ins);
         switch(dir){
             case UP:{
-                //std::cout<<"UP\n";
                 map[y][x] = '^';
                 //For number
                 for(int i = 1; i <= number; i++){
@@ -154,41 +153,20 @@ struct Person{
             }
         }
     }
-    /* void setdirection(const int x, const int y, const std::vector<std::vector<char>>& map){
-        //std::cout<<"SET DOWN\n";
-        //Should be facing down
-        if(y == 0 || map[y - 1].size() < x || map[y - 1][x] == ' '){ dir = DOWN; return;}
-        //std::cout<<"SET UP "<<y<<' '<<map.size()<<'\n';
-        //std::cout<<"y: "<<y<<" x: "<<x<<'\n';
-        //std::cout<<"map[y + 1].size(): "<<map[y + 1].size()<<'\n';
-        //std::cout<<"map[y + 1][x]: "<<map[y + 1][x]<<'\n';
-        //Should be fcaing up
-        if(y == map.size() - 1 || map[y + 1].size() <= x || map[y + 1][x] == ' '){ dir = UP; return; }
-        //std::cout<<"SET RIGHT\n";
-        //Should be facing right
-        if(x == 0 || map[y][x - 1] == ' '){ dir = RIGHT; return; }
-        //std::cout<<"SET LEFT\n";
-        //Should be facing left
-        if(x == map[y].size() - 1 || map[y][x + 1] == ' '){ dir = LEFT; return; }
-    } */
     void move2(std::string ins, std::vector<std::vector<char>>& map, const std::map<std::pair<std::pair<int, int>, int>, std::pair<std::pair<int, int>, int>>& edges){
         if(ins == "L" || ins == "R"){ changeDir(ins[0]); return; }
         int number = std::stoi(ins);
         for(int i = 1; i <= number; i++){
             switch(dir){
                 case UP:{
-                    //std::cout<<"UP\n";
                     map[y][x] = '^';
                     //If spot above is value then move up
                     if((y - 1) >= 0 && map[y - 1].size() > x && map[y - 1][x] != ' ' && map[y - 1][x] != '#'){ y--; map[y][x] = '^'; }
                     else if((y - 1) < 0 || map[y - 1][x] == ' '){ //If spot above an edge
-                        //std::cout<<x<<' '<<y<<' ';
                         std::pair<std::pair<int, int>, int> next = edges.at(std::pair(std::pair(x, y), dir));
                         if(map[next.first.second][next.first.first] != '#'){
                             x = next.first.first;
                             y = next.first.second;
-                            //std::cout<<x<<' '<<y<<'\n';
-                            //setdirection(x, y, map);
                             dir = next.second;
                         }
                         
@@ -197,19 +175,14 @@ struct Person{
                     break;
                 }
                 case RIGHT:{
-                    //std::cout<<"RIGHT\n";
                     map[y][x] = '>';
                     //If spot to right is value then move up
                     if((x + 1) < map[y].size() && map[y][x + 1] != ' ' && map[y][x + 1] != '#'){ x++; map[y][x] = '>'; }
                     else if((x + 1) >= map[y].size() || map[y][x + 1] == ' '){ //If spot to right an edge
-                        //std::cout<<x + 1<<' '<<y<<' ';
-                        //std::cout<<x<<' '<<y<<' ';
                         std::pair<std::pair<int, int>, int> next = edges.at(std::pair(std::pair(x, y), dir));
                         if(map[next.first.second][next.first.first] != '#'){
                             x = next.first.first;
                             y = next.first.second;
-                            //std::cout<<x<<' '<<y<<'\n';
-                            //setdirection(x, y, map);
                             dir = next.second;
                         }
                         
@@ -217,19 +190,14 @@ struct Person{
                     break;
                 }
                 case DOWN:{
-                    //std::cout<<"DOWN\n";
                     map[y][x] = 'v';
                     //If spot below is value then move up
                     if((y + 1) < map.size() && map[y + 1].size() > x && map[y + 1][x] != ' ' && map[y + 1][x] != '#'){ y++; map[y][x] = 'v'; }
                     else if((y + 1) >= map.size() || map[y + 1].size() < x || map[y + 1][x] == ' '){ //If spot below is an edge
-                        //std::cout<<x<<' '<<y + 1<<' ';
-                        //std::cout<<x<<' '<<y<<' ';
                         std::pair<std::pair<int, int>, int> next = edges.at(std::pair(std::pair(x, y), dir));
                         if(map[next.first.second][next.first.first] != '#'){
                             x = next.first.first;
                             y = next.first.second;
-                            //std::cout<<x<<' '<<y<<'\n';
-                            //setdirection(x, y, map);
                             dir = next.second;
                         }
                         
@@ -238,19 +206,14 @@ struct Person{
                     break;
                 }
                 case LEFT:{
-                    //std::cout<<"LEFT\n";
                     map[y][x] = '<';
                     //If spot to left is value then move left
                     if((x - 1) >= 0 && map[y][x - 1] != ' ' && map[y][x - 1] != '#'){ x--; map[y][x] = '<'; }
                     else if((x - 1) < 0 || map[y][x - 1] == ' '){ //If spot to left an edge
-                        //std::cout<<x - 1<<' '<<y<<' ';
-                        //std::cout<<x<<' '<<y<<' ';
                         std::pair<std::pair<int, int>, int> next = edges.at(std::pair(std::pair(x, y), dir));
                         if(map[next.first.second][next.first.first] != '#'){
                             x = next.first.first;
                             y = next.first.second;
-                            //std::cout<<x<<' '<<y<<'\n';
-                            //setdirection(x, y, map);
                             dir = next.second;
                         }
                         
@@ -262,7 +225,6 @@ struct Person{
                     break;
                 }
             }
-            //std::cout<<"NEXT\n";
         }
     }
 };
@@ -282,10 +244,6 @@ auto getInstructions(std::string s){
         out.push_back("L");
     }
     out.erase(out.begin() + out.size() - 1);
-    /* for(auto& o : out){
-        std::cout<<o<<'\n';
-    }
-    std::cout<<'\n'; */
 
     return out;
 }
@@ -376,6 +334,7 @@ auto run1(T input){
         case LEFT: dirval = 2; break;
         case UP: dirval = 3; break;
     }
+    printMap(map);
     return 1000 * (p.y + 1) + 4 * (p.x + 1) + dirval;
 }
 
@@ -409,6 +368,7 @@ auto run2(T input){
         case LEFT: dirval = 2; break;
         case UP: dirval = 3; break;
     }
+    printMap(map);
     return 1000 * (p.y + 1) + 4 * (p.x + 1) + dirval;
 }
 
