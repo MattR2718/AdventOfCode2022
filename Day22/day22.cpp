@@ -154,7 +154,7 @@ struct Person{
             }
         }
     }
-    void setdirection(const int x, const int y, const std::vector<std::vector<char>>& map){
+    /* void setdirection(const int x, const int y, const std::vector<std::vector<char>>& map){
         //std::cout<<"SET DOWN\n";
         //Should be facing down
         if(y == 0 || map[y - 1].size() < x || map[y - 1][x] == ' '){ dir = DOWN; return;}
@@ -170,8 +170,8 @@ struct Person{
         //std::cout<<"SET LEFT\n";
         //Should be facing left
         if(x == map[y].size() - 1 || map[y][x + 1] == ' '){ dir = LEFT; return; }
-    }
-    void move2(std::string ins, std::vector<std::vector<char>>& map, const std::map<std::pair<int, int>, std::pair<int, int>>& edges){
+    } */
+    void move2(std::string ins, std::vector<std::vector<char>>& map, const std::map<std::pair<std::pair<int, int>, int>, std::pair<std::pair<int, int>, int>>& edges){
         if(ins == "L" || ins == "R"){ changeDir(ins[0]); return; }
         int number = std::stoi(ins);
         for(int i = 1; i <= number; i++){
@@ -183,12 +183,13 @@ struct Person{
                     if((y - 1) >= 0 && map[y - 1].size() > x && map[y - 1][x] != ' ' && map[y - 1][x] != '#'){ y--; map[y][x] = '^'; }
                     else if((y - 1) < 0 || map[y - 1][x] == ' '){ //If spot above an edge
                         //std::cout<<x<<' '<<y<<' ';
-                        std::pair<int, int> next = edges.at(std::pair(x, y));
-                        if(map[next.second][next.first] != '#'){
-                            x = next.first;
-                            y = next.second;
+                        std::pair<std::pair<int, int>, int> next = edges.at(std::pair(std::pair(x, y), dir));
+                        if(map[next.first.second][next.first.first] != '#'){
+                            x = next.first.first;
+                            y = next.first.second;
                             //std::cout<<x<<' '<<y<<'\n';
-                            setdirection(x, y, map);
+                            //setdirection(x, y, map);
+                            dir = next.second;
                         }
                         
                     }
@@ -203,12 +204,13 @@ struct Person{
                     else if((x + 1) >= map[y].size() || map[y][x + 1] == ' '){ //If spot to right an edge
                         //std::cout<<x + 1<<' '<<y<<' ';
                         //std::cout<<x<<' '<<y<<' ';
-                        std::pair<int, int> next = edges.at(std::pair(x, y));
-                        if(map[next.second][next.first] != '#'){
-                            x = next.first;
-                            y = next.second;
+                        std::pair<std::pair<int, int>, int> next = edges.at(std::pair(std::pair(x, y), dir));
+                        if(map[next.first.second][next.first.first] != '#'){
+                            x = next.first.first;
+                            y = next.first.second;
                             //std::cout<<x<<' '<<y<<'\n';
-                            setdirection(x, y, map);
+                            //setdirection(x, y, map);
+                            dir = next.second;
                         }
                         
                     }
@@ -222,12 +224,13 @@ struct Person{
                     else if((y + 1) >= map.size() || map[y + 1].size() < x || map[y + 1][x] == ' '){ //If spot below is an edge
                         //std::cout<<x<<' '<<y + 1<<' ';
                         //std::cout<<x<<' '<<y<<' ';
-                        std::pair<int, int> next = edges.at(std::pair(x, y));
-                        if(map[next.second][next.first] != '#'){
-                            x = next.first;
-                            y = next.second;
+                        std::pair<std::pair<int, int>, int> next = edges.at(std::pair(std::pair(x, y), dir));
+                        if(map[next.first.second][next.first.first] != '#'){
+                            x = next.first.first;
+                            y = next.first.second;
                             //std::cout<<x<<' '<<y<<'\n';
-                            setdirection(x, y, map);
+                            //setdirection(x, y, map);
+                            dir = next.second;
                         }
                         
                     }
@@ -242,12 +245,13 @@ struct Person{
                     else if((x - 1) < 0 || map[y][x - 1] == ' '){ //If spot to left an edge
                         //std::cout<<x - 1<<' '<<y<<' ';
                         //std::cout<<x<<' '<<y<<' ';
-                        std::pair<int, int> next = edges.at(std::pair(x, y));
-                        if(map[next.second][next.first] != '#'){
-                            x = next.first;
-                            y = next.second;
+                        std::pair<std::pair<int, int>, int> next = edges.at(std::pair(std::pair(x, y), dir));
+                        if(map[next.first.second][next.first.first] != '#'){
+                            x = next.first.first;
+                            y = next.first.second;
                             //std::cout<<x<<' '<<y<<'\n';
-                            setdirection(x, y, map);
+                            //setdirection(x, y, map);
+                            dir = next.second;
                         }
                         
                     }
@@ -296,59 +300,55 @@ void printMap(const std::vector<std::vector<char>>& map){
 }
 
 auto getedges(std::vector<std::vector<char>> map, bool input){
-    std::map<std::pair<int, int> , std::pair<int, int>> edges;
+    std::map<std::pair<std::pair<int, int>, int> , std::pair<std::pair<int, int>, int>> edges;
 
     if(input){
         for(int i = 0; i < 50; i++){
             //Silver
-            edges[std::pair(50 + i, 0)] = std::pair(0, 150 + i);
-            edges[std::pair(0, 150 + i)] = std::pair(50 + i, 0);
+            edges[std::pair(std::pair(50 + i, 0), UP)] = std::pair(std::pair(0, 150 + i), RIGHT);
+            edges[std::pair(std::pair(0, 150 + i), LEFT)] = std::pair(std::pair(50 + i, 0), DOWN);
             //Green
-            edges[std::pair(50, i)] = std::pair(0, 149 - i);
-            edges[std::pair(0, 149 - i)] = std::pair(50, i);
+            edges[std::pair(std::pair(50, i), LEFT)] = std::pair(std::pair(0, 149 - i), RIGHT);
+            edges[std::pair(std::pair(0, 149 - i), LEFT)] = std::pair(std::pair(50, i), RIGHT);
             //Purple
-            edges[std::pair(50, i + 50)] = std::pair(i, 100);
-            edges[std::pair(i, 100)] = std::pair(50, i + 50);
-            
+            edges[std::pair(std::pair(50, i + 50), LEFT)] = std::pair(std::pair(i, 100), DOWN);
+            edges[std::pair(std::pair(i, 100), UP)] = std::pair(std::pair(50, i + 50), RIGHT);
             //Blank
-            edges[std::pair(100 + i, 0)] = std::pair(i, 199);
-            edges[std::pair(i, 199)] = std::pair(100 + i, 0);
-            /* edges[std::pair(149 - i, 0)] = std::pair(i, 199);
-            edges[std::pair(i, 199)] = std::pair(149 - i, 0); */
-           
+            edges[std::pair(std::pair(100 + i, 0), UP)] = std::pair(std::pair(i, 199), UP);
+            edges[std::pair(std::pair(i, 199), DOWN)] = std::pair(std::pair(100 + i, 0), DOWN);
             //Yellow
-            edges[std::pair(149, i)] = std::pair(99, 149 - i);
-            edges[std::pair(99, 149 - i)] = std::pair(149, i);
+            edges[std::pair(std::pair(149, i), RIGHT)] = std::pair(std::pair(99, 149 - i), LEFT);
+            edges[std::pair(std::pair(99, 149 - i), RIGHT)] = std::pair(std::pair(149, i), LEFT);
             //Red
-            edges[std::pair(100 + i, 49)] = std::pair(99, 50 + i);
-            edges[std::pair(99, 50 + i)] = std::pair(100 + i, 49);
+            edges[std::pair(std::pair(100 + i, 49), DOWN)] = std::pair(std::pair(99, 50 + i), LEFT);
+            edges[std::pair(std::pair(99, 50 + i), RIGHT)] = std::pair(std::pair(100 + i, 49), UP);
             //Blue
-            edges[std::pair(50 + i, 149)] = std::pair(49, 150 + i);
-            edges[std::pair(49, 150 + i)] = std::pair(50 + i, 149);
+            edges[std::pair(std::pair(50 + i, 149), DOWN)] = std::pair(std::pair(49, 150 + i), LEFT);
+            edges[std::pair(std::pair(49, 150 + i), RIGHT)] = std::pair(std::pair(50 + i, 149), UP);
         }
     }else{
         for(int i = 0; i < 4; i++){
             //Blue
-            edges[std::pair(8 + i, 0)] = std::pair(i, 4);
-            edges[std::pair(i, 4)] = std::pair(8 + i, 0);
+            edges[std::pair(std::pair(8 + i, 0), UP)] = std::pair(std::pair(i, 4), DOWN);
+            edges[std::pair(std::pair(i, 4), UP)] = std::pair(std::pair(8 + i, 0), DOWN);
             //Red
-            edges[std::pair(8, i)] = std::pair(4 + i, 4);
-            edges[std::pair(4 + i, 4)] = std::pair(8, i);
+            edges[std::pair(std::pair(8, i), LEFT)] = std::pair(std::pair(4 + i, 4), DOWN);
+            edges[std::pair(std::pair(4 + i, 4), UP)] = std::pair(std::pair(8, i), RIGHT);
             //Purple
-            edges[std::pair(11, i)] = std::pair(15, i + 8);
-            edges[std::pair(15, i + 8)] = std::pair(11, i);
+            edges[std::pair(std::pair(11, i), RIGHT)] = std::pair(std::pair(15, i + 8), LEFT);
+            edges[std::pair(std::pair(15, i + 8), RIGHT)] = std::pair(std::pair(11, i), LEFT);
             //Green
-            edges[std::pair(11, i + 4)] = std::pair(15 - i, 8);
-            edges[std::pair(15 - 8, 8)] = std::pair(11, i + 4);
+            edges[std::pair(std::pair(11, i + 4), RIGHT)] = std::pair(std::pair(15 - i, 8), DOWN);
+            edges[std::pair(std::pair(15 - 8, 8), UP)] = std::pair(std::pair(11, i + 4), LEFT);
             //Silver
-            edges[std::pair(4 + i, 7)] = std::pair(8, 8 + i);
-            edges[std::pair(8, 8 + i)] = std::pair(4 + i, 7);
+            edges[std::pair(std::pair(4 + i, 7), DOWN)] = std::pair(std::pair(8, 8 + i), RIGHT);
+            edges[std::pair(std::pair(8, 8 + i), LEFT)] = std::pair(std::pair(4 + i, 7), UP);
             //Yellow
-            edges[std::pair(i, 7)] = std::pair(11 - i, 11);
-            edges[std::pair(11 - i, 11)] = std::pair(i, 7);
+            edges[std::pair(std::pair(i, 7), DOWN)] = std::pair(std::pair(11 - i, 11), UP);
+            edges[std::pair(std::pair(11 - i, 11), DOWN)] = std::pair(std::pair(i, 7), UP);
             //Blank
-            edges[std::pair(0, 7 - i)] = std::pair(12 + i, 11);
-            edges[std::pair(12 + i, 11)] = std::pair(0, 7 - i);
+            edges[std::pair(std::pair(0, 7 - i), LEFT)] = std::pair(std::pair(12 + i, 11), UP);
+            edges[std::pair(std::pair(12 + i, 11), DOWN)] = std::pair(std::pair(0, 7 - i), RIGHT);
         }
     }
 
@@ -367,9 +367,7 @@ auto run1(T input){
 
     for(auto& ins : instructions){
         p.move1(ins, map);
-        //std::cout<<p<<'\n';
     }
-    printMap(map);
 
     int dirval = 0;
     switch(p.dir){
@@ -378,7 +376,6 @@ auto run1(T input){
         case LEFT: dirval = 2; break;
         case UP: dirval = 3; break;
     }
-    //std::cout<<p<<'\n';
     return 1000 * (p.y + 1) + 4 * (p.x + 1) + dirval;
 }
 
@@ -391,9 +388,8 @@ auto run2(T input){
         if(map[0][i] == '.'){ startx = i; break; }
     }
     Person p{startx, 0};
-    //std::cout<<p<<'\n';
 
-    std::map<std::pair<int, int> , std::pair<int, int>> edges;
+    std::map<std::pair<std::pair<int, int>, int>, std::pair<std::pair<int, int>, int>> edges;
     if(startx == 8){ //Test
         edges =  getedges(map, false);
     }else{ //Input
@@ -403,13 +399,8 @@ auto run2(T input){
     int count = 0;
 
     for(auto& ins : instructions){
-        //std::cout<<ins<<'\n';
         p.move2(ins, map, edges);
-        //if(count++ % 100 == 0){ printMap(map); }
-        //printMap(map);
-        //std::cout<<p<<'\n';
     }
-    printMap(map);
 
     int dirval = 0;
     switch(p.dir){
@@ -418,7 +409,6 @@ auto run2(T input){
         case LEFT: dirval = 2; break;
         case UP: dirval = 3; break;
     }
-    std::cout<<p<<'\n';
     return 1000 * (p.y + 1) + 4 * (p.x + 1) + dirval;
 }
 
@@ -437,6 +427,32 @@ int main(){
 
 
 //Part 1: 1428
+//Part 2: 142380
 
-//40307 too low
-//150156 too high
+/*
+DEBUG:
+    Days              : 0
+    Hours             : 0
+    Minutes           : 0
+    Seconds           : 0
+    Milliseconds      : 207
+    Ticks             : 2071072
+    TotalDays         : 2.39707407407407E-06
+    TotalHours        : 5.75297777777778E-05
+    TotalMinutes      : 0.00345178666666667
+    TotalSeconds      : 0.2071072
+    TotalMilliseconds : 207.1072
+
+RELEASE:
+    Days              : 0
+    Hours             : 0
+    Minutes           : 0
+    Seconds           : 0
+    Milliseconds      : 35
+    Ticks             : 355194
+    TotalDays         : 4.11104166666667E-07
+    TotalHours        : 9.8665E-06
+    TotalMinutes      : 0.00059199
+    TotalSeconds      : 0.0355194
+    TotalMilliseconds : 35.5194
+*/
