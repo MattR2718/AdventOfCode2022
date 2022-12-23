@@ -11,7 +11,7 @@ enum Direction{NORTH, SOUTH, EAST, WEST};
 struct Elf{
     int x, y;
     int proposed;
-    int px = 10000, py = 10000;
+    int px, py;
     friend std::ostream& operator<<(std::ostream& os, const Elf& e){
         os << "x: "<<e.x<<" y: "<<e.y <<" px: "<<e.px<<" py: "<<e.py;
         return os;
@@ -68,8 +68,8 @@ struct Elf{
             }
         }
         //std::cout<<pos<<'\n';
-        //if(pos.count() == 0){numNoMove++; return; }
-        if(pos.none()){ /* px = x; py = y; */ std::cout<< "x: "<<x<<" y: "<<y <<" px: "<<px<<" py: "<<py<<"\n"; numNoMove++; return; }
+        //if(pos.count() == 1){numNoMove++; return; }
+        if(pos.none()){ px = x; py = y; /* std::cout<< "x: "<<x<<" y: "<<y <<" px: "<<px<<" py: "<<py<<"\n"; */ numNoMove++; return; }
         //std::cout<<"-------------------------------  "<<pos<<'\n';
 
         switch (round % 4){
@@ -120,6 +120,7 @@ void print(const std::vector<Elf>& elves){
         std::cout<<'\n';
     }
     std::cout<<'\n';
+    std::cout<<maxx<<' '<<minx<<' '<<maxy<<' '<<miny<<'\n';
 }
 
 int count(const std::vector<Elf>& elves){
@@ -160,11 +161,14 @@ auto run1(T input){
 template<typename T>
 auto run2(T input){
     std::cout<<input.size()<<'\n';
+    //print(input);
     int num = 0;
     int round = 0;
     T prev = input;
+    //int prevc = 0;
     do{
         prev = input;
+        //prevc = count(input);
         num = 0;
         for(auto& e : input){
             e.getProposed(input, round, num);
@@ -178,11 +182,28 @@ auto run2(T input){
         }
         round++;
         std::cout<<num<<" "<<round<<'\n';
-        //if(round > 1016){ print(input); }
-    //}while (num < input.size());
+        /* if(round > 980){ print(input); }
+        int minx = 1000000;
+        int miny = 1000000;
+        int maxx = -1000000;
+        int maxy = -1000000;
+        for(auto& e : input){
+            if(e.x < minx){ minx = e.x; }
+            if(e.y < miny){ miny = e.y; }
+            if(e.x > maxx){ maxx = e.x; }
+            if(e.y > maxy){ maxy = e.y; }
+        }
+        std::cout<<maxx<<' '<<minx<<' '<<maxy<<' '<<miny<<'\n'; */
+    }while (num < input.size());
 
-    }while(prev != input);
+        
+
+    //}while(prev != input);
+
+
+    //for(auto& e : input){ std::cout<<e<<'\n';}
     
+    //print(input);
  
     return round;
 }
@@ -203,3 +224,4 @@ int main(){
 
 //1018 too high
 //969 too low
+//982 too low

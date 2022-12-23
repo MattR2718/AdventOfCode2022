@@ -1,6 +1,6 @@
 from collections import Counter as hist
 
-elves = {complex(x, y) for x, r in enumerate(open('Day23/input.txt'))
+elves = {complex(x, y) for x, r in enumerate(open('Day23/stoleninput.txt'))
                        for y, c in enumerate(r) if c == '#'}
 
 dirs = (-1, 1, -1j, 1j)
