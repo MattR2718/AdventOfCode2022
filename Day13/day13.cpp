@@ -11,48 +11,47 @@
 using json = nlohmann::json;
 
 auto getInput(const std::string f = "..\\..\\Day13\\test.txt"){
-    std::ifstream file(f);
+    //std::ifstream file(f);
     std::string linetxt;
-    std::vector<std::string> out;
-    while (std::getline(file, linetxt)){
+    std::vector<json> out;
+    while (std::getline(std::cin, linetxt)){
         if(linetxt.size() != 0){
-            out.push_back(linetxt);
+            out.push_back(json::parse(linetxt));
         }
     }
     return out;
 }
 
-template <typename T>
-char compare(T l, T r){
-    json left = json::parse(l);
-    json right = json::parse(r);
-
-    if(left.size() < right.size()) { return 'y'; }
-    //std::cout<<left.size()<<' '<<right.size()<<'\n';
-
-    if(left.size() == 1 && right.size() == 1){
-        if(left.is_array() && right.is_array()){ 
-            char c = compare(left[0].get<std::string>(), right[0].get<std::string>()); 
-        }else if(left.is_number() && right.is_number()){
-            if(left[0].get<int>() < right[0].get<int>()){ return 'y';}
-            else if(left[0].get<int>() == right[0].get<int>()){ return 'm'; }
-            else{ return 'n'; }
-        }
+bool operator<(const json& left, const json& right){
+    if(left.is_number_integer() && right.is_number_integer()){
+        return left.get<int>() < right.get<int>();
+    }else if(left.is_array() && right.is_array()){
+        return std::lexicographical_compare(left.begin(), left.end(), right.begin(), right.end());
+    }else if(left.is_array()){
+        return left < json::array({right.get<int>()});
+    }else if(right.is_array()){
+        return json::array({left.get<int>()}) < right;
+    }else{
+        std::cout<<"ERROR LEFT AND RIGHT NOT KNOWN: "<<left<<' '<<right<<'\n';
+        return 0;
     }
-
-    return '-';
 }
 
 template<typename T>
 auto run1(T input){
-
-    int correct = 0;
+    std::cout<<"\n\n\n";
+    int yes = 0;
     for(int i = 0; i < input.size(); i += 2){
-        char c = compare(input[i], input[i+1]);
-        if(c == 'y'){ correct++; }
+        //json left = json::parse(input[i]);
+        //json right = json::parse(input[i + 1]);
+        if(input[i] < input[i + 1]){
+            std::cout<<i<<": "<<input[i]<<' '<<input[i + 1]<<'\n';
+            yes+=i/2 + 1; 
+        }
     }
+    
 
-    return correct;    
+    return yes;    
 }
 
 template<typename T>
@@ -84,3 +83,5 @@ int main(){
     std::cout<<"Part 1: "<<run1(input)<<'\n';
     //std::cout<<"Part 2: "<<run2(input)<<'\n';
 }
+
+//5501 too high
