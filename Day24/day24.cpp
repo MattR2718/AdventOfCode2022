@@ -126,6 +126,7 @@ std::pair<int, int> bfs(const int start, const std::vector<int>& ends, const std
     visited.emplace(start);
     prev[start] = std::make_pair(start, 0);
 
+    bool done = false;
     while(!q.empty()){
         int curr = q.front();
         q.pop();
@@ -136,11 +137,12 @@ std::pair<int, int> bfs(const int start, const std::vector<int>& ends, const std
                 if(tempDist < prev[nei].second){
                     prev[nei] = std::make_pair(curr, tempDist);
                 }
+                if(std::find(ends.begin(), ends.end(), nei) != ends.end()){ done = true; break;}
                 visited.emplace(nei);
             }
         }
+        if(done){ break; }
     }
-
     //                      <val,   dist>
     std::pair<int, int> min{1000000, 1000000};
     for(int i = 0; i < ends.size(); i++){
@@ -231,12 +233,12 @@ RELEASE:
     Days              : 0
     Hours             : 0
     Minutes           : 0
-    Seconds           : 6
-    Milliseconds      : 547
-    Ticks             : 65471359
-    TotalDays         : 7.57770358796296E-05
-    TotalHours        : 0.00181864886111111
-    TotalMinutes      : 0.109118931666667
-    TotalSeconds      : 6.5471359
-    TotalMilliseconds : 6547.1359
+    Seconds           : 4
+    Milliseconds      : 879
+    Ticks             : 48795067
+    TotalDays         : 5.64757719907407E-05
+    TotalHours        : 0.00135541852777778
+    TotalMinutes      : 0.0813251116666667
+    TotalSeconds      : 4.8795067
+    TotalMilliseconds : 4879.5067
 */
