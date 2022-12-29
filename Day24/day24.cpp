@@ -4,11 +4,10 @@
 #include <algorithm>
 #include <string>
 #include <map>
-#include <bitset>
 #include <set>
 #include <ranges>
-
-#define STILLFOR_LIMIT 10
+#include <iomanip>
+#include <queue>
 
 struct Blizzard{
     int x, y;
@@ -24,7 +23,7 @@ auto getInput(const std::string f = "..\\..\\..\\..\\Day24\\test.txt"){
     std::vector<std::string> map;
     int y = 0;
     int x = 0;
-    while (std::getline(file, linetxt)){
+    while (std::getline(std::cin, linetxt)){
         std::vector<char> temp;
         x = linetxt.length();
         for(int i = 0; i < linetxt.length(); i++){ if(linetxt[i] != '#' && linetxt[i] != '.'){out.emplace_back(Blizzard{i, y, linetxt[i]}); }}
@@ -34,27 +33,6 @@ auto getInput(const std::string f = "..\\..\\..\\..\\Day24\\test.txt"){
     int startx = std::find(map[0].begin(), map[0].end(), '.') - map[0].begin();
     int endx = std::find(map[map.size() - 1].begin(), map[map.size() - 1].end(), '.') - map[map.size() - 1].begin();
     return std::tuple(out, --x, --y, startx, endx);
-}
-
-template<typename T>
-void print(T input, int x, int y){
-    std::cout<<'\n';
-    auto[blizzards, maxx, maxy, startx, endx]{input};
-    for(int j = 0; j <= maxy; j++){
-        for(int i = 0; i <= maxx; i++){
-            if (i == x && j == y) { std::cout << 'E'; }else
-            if(i == 0 || i == maxx || (j == 0 && i != startx) || (j == maxy && i != endx)){ std::cout<<'#';}
-            else{
-                bool boo = true;
-                int count = 0;
-                int n = 0;
-                int c = 0;
-                for(auto& b: blizzards){ if(b.x == i && b.y == j){ count++; n = c; } c++; }
-                if(count == 1){ std::cout<<blizzards[n].c; }else if(count){ std::cout<<count; } else{std::cout<<'.'; }
-            }
-        }
-        std::cout<<'\n';
-    }
 }
 
 template<typename T>
@@ -71,101 +49,194 @@ void step(T& input){
 
 }
 
-//<<blizzard location, x, y, time>>
-std::vector<std::tuple<std::vector<Blizzard>, int, int, int>> cache;
-
-struct Position{
-    int x, y, time;
-    std::vector<Blizzard> map;
-    std::vector<Position> next;
-    //template<typename T>
-    Position(int x_, int y_, int t, std::tuple<std::vector<Blizzard>, int, int, int, int> input, int stillfor, bool st = true){
-        //if(t > 20){ return; }
-        //std::cout << t << '\n';
-        x = x_;
-        y = y_;
-        time = t;
-        const auto&[blizzards, maxx, maxy, startx, endx]{input};
-        if(x == endx && y == maxy){ return; }
-        if(st){ step(input); map = std::get<0>(input); }else{ map = std::get<0>(input);}
-
-        
-        
-
-        std::bitset<4> pos(0b1111);
-        //print(input, x, y);
-        for(auto& b : map){
-            //Right
-            if((b.x == x + 1 && b.y == y) || x + 1 >= maxx || y == 0){ pos[0] = false; }
-            //Left
-            if((b.x == x - 1 && b.y == y) || x - 1 <= 0 || y == 0){ pos[1] = false; }
-            //Up
-            if((b.y == y - 1 && b.x == y) || y - 1 <= 0){ pos[2] = false; }
-            //Down
-            if((b.y == y + 1 && b.x == y) || y + 1 >= maxy){ pos[3] = false; }
-        }
-        if(pos[0]){ next.emplace_back(Position(x + 1, y, t + 1, input, 0)); }
-        if(pos[1]){ next.emplace_back(Position(x - 1, y, t + 1, input, 0)); }
-        if(pos[2]){ next.emplace_back(Position(x, y - 1, t + 1, input, 0)); }
-        if(pos[3]){ next.emplace_back(Position(x, y + 1, t + 1, input, 0)); }
-        if(stillfor > STILLFOR_LIMIT){ return; }
-        else{ next.emplace_back(Position(x, y, t + 1, input, stillfor + 1)); }
-    }
-
-    void findMin(int ex, int ey, std::vector<int>& times) {
-        if (x == ex && y == ey - 1) { times.push_back(time); }
-        for (auto& e : next) {
-            e.findMin(ex, ey, times);
+std::vector<char> makeMap(const std::vector<Blizzard>& blizzards, int maxx, int maxy, int startx, int endx){
+    std::vector<char> bmaps;
+    for(int j = 0; j <= maxy; j++){
+        for(int i = 0; i <= maxx; i++){
+            if(i == 0 || i == maxx || (j == 0 && i != startx) || (j == maxy && i != endx)){ bmaps.emplace_back('#');}
+            else{
+                bool boo = true;
+                int count = 0;
+                int n = 0;
+                int c = 0;
+                for(auto& b: blizzards){ if(b.x == i && b.y == j){ count++; n = c; } c++; }
+                if(count == 1){ bmaps.emplace_back(blizzards[n].c); }else if(count){ bmaps.emplace_back(count + '0'); } else{bmaps.emplace_back('.'); }
+            }
         }
     }
-};
+    return bmaps;
+}
 
-template<typename T>
-auto run1(T input){
-    auto[blizzards, maxx, maxy, startx, endx]{input};
-    std::cout<<maxx<<' '<<maxy<<'\n';
+void printBMap(const std::vector<char>& map, int maxx){
+    for(int i = 0; i < map.size(); i++){
+        if(i % (maxx + 1) == 0){ std::cout<<'\n'; }
+        std::cout<<map[i];
+    }
+    std::cout<<'\n';
+}
 
-    std::vector<std::vector<Blizzard>> blizzs;
+void addToAdj(const std::vector<char>& from, const std::vector<char>& to, const int fromStartID, const int toStartID, const int width, std::map<int, std::vector<int>>& adj){
+    for(int j = 0; j < from.size() / width; j++){
+        for(int i = 0; i < width; i++){
+            if(from[j * width + i] == '.'){
+                adj[fromStartID + j * width + i];
+                if(to[j * width + i] == '.'){ //Stay
+                    adj[fromStartID + j * width + i].emplace_back(toStartID + j * width + i);
+                }
+
+                if(j - 1 > -1 && to[(j - 1) * width + i] == '.'){ //Up
+                    adj[fromStartID + j * width + i].emplace_back(toStartID + (j - 1) * width + i);
+                }
+
+                if(j + 1 < (from.size() / width) && to[(j + 1) * width + i] == '.'){ //Down
+                    adj[fromStartID + j * width + i].emplace_back(toStartID + (j + 1) * width + i);
+                }
+                
+                if(i - 1 > -1 && to[j * width + (i - 1)] == '.'){ //Left
+                    adj[fromStartID + j * width + i].emplace_back(toStartID + j * width + (i - 1));
+                }
+                
+                if(i + 1 < width && to[j * width + (i + 1)] == '.'){ //Right
+                    adj[fromStartID + j * width + i].emplace_back(toStartID + j * width + (i + 1));
+                }
+            }
+        }
+    }
+}
+
+void printAdj(const std::map<int, std::vector<int>>& adj){
+    for(auto& v : adj){
+        std::cout<<v.first<<": ";
+        for(auto& i : v.second){
+            std::cout<<std::setw(4)<<i<<' ';
+        }
+        std::cout<<'\n';
+    }
+}
+
+std::pair<int, int> bfs(const int start, const std::vector<int>& ends, const std::map<int, std::vector<int>>& adj){
+    std::queue<int> q;
+    std::set<int> visited;
+    //                    <prev, dist>
+    std::map<int, std::pair<int, int>> prev;
+    for(auto& a : adj){
+        prev[a.first] = std::make_pair(-1, 10000000);
+    }
+    q.push(start);
+    visited.emplace(start);
+    prev[start] = std::make_pair(start, 0);
+
+    while(!q.empty()){
+        int curr = q.front();
+        q.pop();
+        for(auto& nei : adj.at(curr)){
+            if(!visited.contains(nei)){
+                q.push(nei);
+                int tempDist = prev[curr].second + 1;
+                if(tempDist < prev[nei].second){
+                    prev[nei] = std::make_pair(curr, tempDist);
+                }
+                visited.emplace(nei);
+            }
+        }
+    }
+
+    //                      <val,   dist>
+    std::pair<int, int> min{1000000, 1000000};
+    for(int i = 0; i < ends.size(); i++){
+        if(prev[ends[i]].second < min.second){ min = std::pair{ends[i], prev[ends[i]].second}; }
+    }
+
+    return min;
+}
+
+template <typename T>
+auto getMaps(T input){
+    auto[bs, maxx, maxy, startx, endx]{input};
+    std::vector<std::vector<char>> blizzMaps;
+    std::vector<char> tMap = makeMap(std::get<0>(input), maxx, maxy, startx, endx);
     do{
-        blizzs.emplace_back(blizzards);
-        step(blizzards);
-    }while(std::find(blizzs.begin(), blizzs.end(), blizzards) ==)
-    
-    Position p(startx, 0, 0, input, 0, false);
-    std::vector<int> mins;
-    p.findMin(endx, maxy, mins);
+        blizzMaps.emplace_back(tMap);
+        step(input);
+        tMap = makeMap(std::get<0>(input), maxx, maxy, startx, endx);
+    }while(std::find(blizzMaps.begin(), blizzMaps.end(), tMap) == blizzMaps.end());
 
+    return blizzMaps;
+}
 
-    for (auto& m : mins) {
-        std::cout << "MIN: " << m << '\n';
+template <typename T>
+auto createAdj(const auto& blizzMaps, const T input){
+    auto[bs, maxx, maxy, startx, endx]{input};
+    int size = (maxx + 1) * (maxy + 1);
+    std::map<int, std::vector<int>> adj;
+    for(int i = 0; i < blizzMaps.size() - 1; i++){
+        addToAdj(blizzMaps[i], blizzMaps[i + 1], i * size, (i + 1) * size, maxx + 1, adj);
     }
-    int m = *std::ranges::min_element(mins);
+    addToAdj(blizzMaps[blizzMaps.size() - 1], blizzMaps[0], (blizzMaps.size() - 1) * size, 0, maxx + 1, adj);
 
-    return m;
+    return adj;
 }
 
 template<typename T>
-std::string run2(T input){
-    for(int i = 0; i < input.size() - 1; i++){
-        for (int j = i + 1; j < input.size(); j++){
-            std::vector<int> diff;
-            for (int k = 0; k < input[j].length(); k++){
-                if (input[i][k] != input[j][k]){
-                    diff.push_back(k);
-                }
-            }
-            if (diff.size() == 1){
-                input[i].erase(diff[0], 1);
-                return input[i];
-            }
-        }
+auto run1(T input, const auto& blizzMaps, const auto& adj){
+    auto[bs, maxx, maxy, startx, endx]{input};
+    int size = (maxx + 1) * (maxy + 1);
+
+    //Multiple possible end points so will have to check all and return smallest
+    std::vector<int> ends;
+    for(int i = 0; i < blizzMaps.size(); i++){
+        ends.emplace_back(i * size + ((maxx + 1) * maxy) + endx);
     }
-    return "ERROR";
+    return bfs(startx, ends, adj).second;
+}
+
+
+template<typename T>
+auto run2(T input, const auto& blizzMaps, const auto& adj){
+    auto[bs, maxx, maxy, startx, endx]{input};
+
+    int size = (maxx + 1) * (maxy + 1);
+
+    std::vector<int> ends;
+    std::vector<int> starts;
+    for(int i = 0; i < blizzMaps.size(); i++){
+        ends.emplace_back(i * size + ((maxx + 1) * maxy) + endx);
+        starts.emplace_back(i * size + startx);
+    }
+
+    auto one = bfs(startx, ends, adj);
+    auto two = bfs(one.first, starts, adj);
+    auto three = bfs(two.first, ends, adj);
+    
+    return one.second + two.second + three.second;
 }
 
 int main(){
     auto input = getInput();
+
+    auto bmap = getMaps(input);
+    auto adj = createAdj(bmap, input);
    
-    std::cout<<"Part 1: "<<run1(input)<<'\n';
-    //std::cout<<"Part 2: "<<run2(input)<<'\n';
+    std::cout<<"Part 1: "<<run1(input, bmap, adj)<<'\n';
+    std::cout<<"Part 2: "<<run2(input, bmap, adj)<<'\n';
 }
+
+
+
+//Part 1: 297
+//Part 2: 856
+
+/*
+RELEASE: 
+    Days              : 0
+    Hours             : 0
+    Minutes           : 0
+    Seconds           : 6
+    Milliseconds      : 547
+    Ticks             : 65471359
+    TotalDays         : 7.57770358796296E-05
+    TotalHours        : 0.00181864886111111
+    TotalMinutes      : 0.109118931666667
+    TotalSeconds      : 6.5471359
+    TotalMilliseconds : 6547.1359
+*/

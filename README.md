@@ -23,4 +23,6 @@
 - [x] Day20
 - [x] Day21
 - [x] Day22
-- [ ] Day22
+- [ ] Day23
+- [x] Day24
+- [ ] Day25
